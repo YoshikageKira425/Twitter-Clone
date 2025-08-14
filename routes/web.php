@@ -1,17 +1,48 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\RetweetController;
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TweetController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return view('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/feed', [TweetController::class, 'feed'])->name('feed');
+    Route::resource('posts', TweetController::class)->except(['create', 'edit']);
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+    Route::prefix('api')->group(function () {
+        Route::get('/feed', [TweetController::class, 'apiFeed']);
+        Route::apiResource('posts', TweetController::class);
+
+        Route::resource('comments', CommentController::class)->only(['index', 'store', 'update', 'destroy']);
+
+        Route::get('/posts/{post}/like', [LikeController::class, 'index']);
+        Route::post('/posts/{post}/like', [LikeController::class, 'store']);
+        Route::delete('/posts/{post}/like', [LikeController::class, 'destroy']);
+
+        Route::get('/posts/{post}/retweet', [RetweetController::class, 'index']);
+        Route::post('/posts/{post}/retweet', [RetweetController::class, 'store']);
+        Route::delete('/posts/{post}/retweet', [RetweetController::class, 'destroy']);
+
+        Route::get('/posts/{post}/bookmark', [BookmarkController::class, 'index']);
+        Route::post('/posts/{post}/bookmark', [BookmarkController::class, 'store']);
+        Route::delete('/posts/{post}/bookmark', [BookmarkController::class, 'destroy']);
+
+        Route::post('/users/{user}/follow', [FollowController::class, 'store']);
+        Route::delete('/users/{user}/follow', [FollowController::class, 'destroy']);
+
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    });
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
