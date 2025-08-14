@@ -23,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/feed', [TweetController::class, 'apiFeed']);
         Route::apiResource('posts', TweetController::class);
 
-        Route::resource('comments', CommentController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('comments', CommentController::class)->only(['index', 'store', 'destroy']);
 
         Route::get('/posts/{post}/like', [LikeController::class, 'index']);
         Route::post('/posts/{post}/like', [LikeController::class, 'store']);
