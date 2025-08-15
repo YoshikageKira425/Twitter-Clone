@@ -5,18 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class TweetController extends Controller
 {
     public function index()
     {
-        $tweets = Tweet::with('user')->latest()->get();
-        return view('tweets.index', compact('tweets'));
-    }
-
-    public function create()
-    {
-        return view('tweets.create');
+        $tweets = Tweet::all();
+        return Inertia::render("home", ["tweets" => $tweets]);
     }
 
     public function store(Request $request)
@@ -42,7 +38,7 @@ class TweetController extends Controller
     public function show($id)
     {
         $tweet = Tweet::findOrFail($id);
-        return view('tweets.show', compact('tweet'));
+        return Inertia::render("tweet", ["tweet" => $tweet]);
     }
 
     public function edit($id)

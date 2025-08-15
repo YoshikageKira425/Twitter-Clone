@@ -9,18 +9,17 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TweetController;
-
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+use App\Http\Controllers\UserController;
+use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/feed', [TweetController::class, 'feed'])->name('feed');
+    Route::get('/', [TweetController::class, 'index'])->name('home');
     Route::resource('posts', TweetController::class)->except(['create', 'edit']);
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get("/account/{user_id}", [UserController::class, 'index'])->name("user.index");
 
     Route::prefix('api')->group(function () {
-        Route::get('/feed', [TweetController::class, 'apiFeed']);
+        Route::get('/feed', [TweetController::class, 'feed']);
         Route::apiResource('posts', TweetController::class);
 
         Route::resource('comments', CommentController::class)->only(['index', 'store', 'destroy']);
