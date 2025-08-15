@@ -1,10 +1,11 @@
 import NavBar from '@/components/side-nav/nav-bar.jsx';
 import Tweet from '@/components/tweets/tweet';
+import CommentSection from '@/components/tweets/commentSection';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
 export default function Home() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, tweet } = usePage<SharedData>().props;
 
     return (
         <div className="flex h-screen bg-black text-gray-100">
@@ -13,7 +14,19 @@ export default function Home() {
             </div>
 
             <div className="w-3/5 flex-2 border-r border-gray-800">
-                <Tweet tweet={null} />
+                <Tweet tweet={tweet} />
+
+                <div className="flex border-b border-gray-800 p-4">
+                    <div className="flex w-full">
+                        <textarea
+                            className="h-12 w-full resize-none bg-transparent p-2 text-lg placeholder-gray-500 outline-none"
+                            placeholder="Leave Comment!"
+                        />
+                        <button className="rounded-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600">Post</button>
+                    </div>
+                </div>
+
+                <CommentSection />
             </div>
 
             <div className="w-1/4 border-l border-gray-800">

@@ -14,6 +14,11 @@ class TweetController extends Controller
         return Inertia::render("home", ["tweets" => Tweet::with('user')->get()]);
     }
 
+    public function show($id)
+    {
+        return Inertia::render("tweet", ["tweet" => Tweet::with('user')->findOrFail($id)]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -32,12 +37,6 @@ class TweetController extends Controller
         ]);
 
         return back()->with('success', 'Tweet created successfully.');
-    }
-
-    public function show($id)
-    {
-        $tweet = Tweet::findOrFail($id);
-        return Inertia::render("tweet", ["tweet" => $tweet]);
     }
 
     public function edit($id)

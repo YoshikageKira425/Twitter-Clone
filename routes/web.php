@@ -14,13 +14,13 @@ use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TweetController::class, 'index'])->name('home');
-    Route::resource('posts', TweetController::class)->except(['create', 'edit']);
+    Route::get('/tweet/{id}', [TweetController::class, "show"]);
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::get("/account/{user_id}", [UserController::class, 'index'])->name("user.index");
+    Route::get("/account/{user}", [UserController::class, 'index'])->name("user.index");
 
     Route::prefix('api')->group(function () {
         Route::get('/feed', [TweetController::class, 'feed']);
-        Route::apiResource('posts', TweetController::class);
+        Route::resource('posts', TweetController::class)->only(['update', 'store', 'destroy']);
 
         Route::resource('comments', CommentController::class)->only(['index', 'store', 'destroy']);
 
