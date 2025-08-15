@@ -1,19 +1,46 @@
 import NavBar from '@/components/side-nav/nav-bar.jsx';
+import Tweet from '@/components/tweets/tweet';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
+import { FaRegUserCircle } from 'react-icons/fa';
 
-export default function Home() {
-    const { auth } = usePage<SharedData>().props;
+export default function Account() {
+    const { auth, user, tweets } = usePage<SharedData>().props;
+
+    console.log(tweets);
 
     return (
         <div className="flex h-screen bg-black text-gray-100">
-            <div className="w-1/5 border-r border-gray-800">
+            <div className="fixed h-full w-1/5 overflow-y-auto border-r border-gray-800 bg-black">
                 <NavBar />
             </div>
 
-            <div className="w-3/5 flex-2 border-r border-gray-800"></div>
+            <div className="mr-[25%] ml-[20%] w-3/5 flex-grow border-r border-gray-800 bg-black">
+                <div className="border-b border-gray-800 bg-neutral-900 p-6">
+                    <div className="flex items-center space-x-6">
+                        <img className="h-24 w-24 rounded-full border-2 border-gray-700" src={user.profile_image} alt={`${user.name}'s avatar`} />
+                        <div>
+                            <h2 className="text-2xl font-bold">{user.name}</h2>
+                            {auth.user.id === user.id && (
+                                <button className="mt-2 rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600">
+                                    Edit Profile
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="mt-6 text-gray-400">
+                        <p className="mb-2">{user.bio || 'No bio yet.'}</p>
+                        <p className="flex items-center space-x-2">
+                            <FaRegUserCircle />
+                            <span>Joined on {new Date(user.created_at).toLocaleDateString()}</span>
+                        </p>
+                    </div>
+                </div>
 
-            <div className="w-1/4 border-l border-gray-800">
+                <div>{tweets.length > 0 && tweets.map((tweet, index) => <Tweet key={index} tweet={tweet} />)}</div>
+            </div>
+
+            <div className="fixed top-0 right-0 h-full w-1/4 overflow-y-auto border-l border-gray-800 bg-black">
                 <div className="p-4">
                     <h3 className="text-xl font-bold">What's happening</h3>
                     <div className="mt-4 rounded-xl bg-gray-900 p-4">

@@ -20,16 +20,17 @@ export default function Tweet({ tweet }) {
 
     return (
         <div className="cursor-pointer border-b border-gray-800 p-4 transition-colors duration-200 hover:bg-neutral-900">
-            <a href={`/tweet/${tweet.id}`} className="flex">
-                <img className="mr-3 h-10 w-10 rounded-full" src={tweet.user.profile_image_url} alt="User avatar" />
-                <div className="flex flex-grow flex-col">
+            <div href={`/tweet/${tweet.id}`} className="flex">
+                <a href={`/account/${tweet.user.name}`}>
+                    <img className="mr-3 h-10 w-10 rounded-full" src={tweet.user.profile_image} alt="User avatar" />
+                </a>
+                <a href={`/tweet/${tweet.id}`} className="flex flex-grow flex-col">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
                             <span className="font-bold text-white">{tweet.user.name}</span>
                             <span className="mx-1 text-gray-500">·</span>
                             <span className="text-gray-500">{timeAgo(tweet.created_at)}</span>
                         </div>
-
                     </div>
 
                     <p className="mt-1 text-white">{tweet.content}</p>
@@ -54,8 +55,8 @@ export default function Tweet({ tweet }) {
                             <span className="text-sm">0</span>
                         </button>
                     </div>
-                </div>
-            </a>
+                </a>
+            </div>
         </div>
     );
 }

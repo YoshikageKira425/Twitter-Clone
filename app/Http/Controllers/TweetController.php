@@ -31,12 +31,17 @@ class TweetController extends Controller
             $imagePath = $request->file('image')->store('tweet_images', 'public');
         }
 
-        Auth::user()->tweets()->create([
+        $newTweet = Auth::user()->tweets()->create([
             'content' => $request->content,
             'image' => $imagePath,
         ]);
 
-        return back()->with('success', 'Tweet created successfully.');
+        $newTweet->load('user');
+
+        return response()->json([
+            'tweet' => $newTweet,
+            'success' => 'Tweet was made successfully.'
+        ], 201);
     }
 
     public function edit($id)

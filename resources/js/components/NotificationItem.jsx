@@ -2,7 +2,7 @@ import { FaHeart, FaRetweet, FaUserPlus } from 'react-icons/fa';
 import { MdAlternateEmail } from 'react-icons/md';
 
 export default function NotificationItem({ notification }) {
-    const { type, user, tweet_content, created_at } = notification;
+    const { type, user, data, created_at } = notification;
 
     let icon, message;
 
@@ -68,7 +68,7 @@ export default function NotificationItem({ notification }) {
                     <img className="mr-3 h-10 w-10 rounded-full" src={user.profile_image_url} alt="User avatar" />
                     <div>
                         {message}
-                        {tweet_content && <p className="mt-1 text-gray-500">{tweet_content}</p>}
+                        {data && <p className="mt-1 text-gray-500">{data}</p>}
                     </div>
                 </div>
                 <span className="mt-2 block text-right text-sm text-gray-500">{formatTimestamp(created_at)}</span>

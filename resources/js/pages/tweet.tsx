@@ -9,11 +9,11 @@ export default function Home() {
 
     return (
         <div className="flex h-screen bg-black text-gray-100">
-            <div className="w-1/5 border-r border-gray-800">
+            <div className="fixed h-full w-1/5 overflow-y-auto border-r bg-black border-gray-800">
                 <NavBar />
             </div>
 
-            <div className="w-3/5 flex-2 border-r border-gray-800">
+            <div className="mr-[25%] ml-[20%] w-3/5 flex-grow border-r bg-black border-gray-800">
                 <Tweet tweet={tweet} />
 
                 <div className="flex border-b border-gray-800 p-4">
@@ -29,7 +29,7 @@ export default function Home() {
                 <CommentSection />
             </div>
 
-            <div className="w-1/4 border-l border-gray-800">
+            <div className="fixed top-0 right-0 h-full w-1/4 overflow-y-auto border-l bg-black border-gray-800">
                 <div className="p-4">
                     <h3 className="text-xl font-bold">What's happening</h3>
                     <div className="mt-4 rounded-xl bg-gray-900 p-4">
