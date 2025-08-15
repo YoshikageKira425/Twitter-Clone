@@ -11,7 +11,7 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        return Inertia::render("notifications", ["notificastions" => Notification::whereAll("user_id", Auth::user()->id)]);
+        return Inertia::render("notifications", ["notifications" => Notification::where("user_id", Auth::user()->id)]);
     }
 
     public function markAsRead() {}
