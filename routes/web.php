@@ -24,17 +24,14 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('comments', CommentController::class)->only(['index', 'store', 'destroy']);
 
-        Route::get('/posts/{post}/like', [LikeController::class, 'index']);
-        Route::post('/posts/{post}/like', [LikeController::class, 'store']);
-        Route::delete('/posts/{post}/like', [LikeController::class, 'destroy']);
+        Route::post('/{type}/{id}/like', [LikeController::class, 'store']);
+        Route::delete('/{type}/{id}/like', [LikeController::class, 'destroy']);
 
-        Route::get('/posts/{post}/retweet', [RetweetController::class, 'index']);
-        Route::post('/posts/{post}/retweet', [RetweetController::class, 'store']);
-        Route::delete('/posts/{post}/retweet', [RetweetController::class, 'destroy']);
+        Route::post('/{type}/{id}/retweet', [RetweetController::class, 'store']);
+        Route::delete('/{type}/{id}/retweet', [RetweetController::class, 'destroy']);
 
-        Route::get('/posts/{post}/bookmark', [BookmarkController::class, 'index']);
-        Route::post('/posts/{post}/bookmark', [BookmarkController::class, 'store']);
-        Route::delete('/posts/{post}/bookmark', [BookmarkController::class, 'destroy']);
+        Route::post('/{type}/{id}/bookmark', [BookmarkController::class, 'store']);
+        Route::delete('/{type}/{id}/bookmark', [BookmarkController::class, 'destroy']);
 
         Route::post('/users/{user}/follow', [FollowController::class, 'store']);
         Route::delete('/users/{user}/follow', [FollowController::class, 'destroy']);

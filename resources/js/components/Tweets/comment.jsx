@@ -1,4 +1,3 @@
-import { BiDotsHorizontalRounded } from 'react-icons/bi';
 import { FaRegComment, FaRegHeart, FaRetweet } from 'react-icons/fa';
 
 export default function Comment() {
@@ -20,11 +19,7 @@ export default function Comment() {
 
     return (
         <div className="flex border-b border-gray-800 p-4 transition-colors duration-200 hover:bg-neutral-900">
-            <img
-                className="mr-3 h-10 w-10 rounded-full"
-                src={'https://via.placeholder.com/150'}
-                alt="User avatar"
-            />
+            <img className="mr-3 h-10 w-10 rounded-full" src={'https://via.placeholder.com/150'} alt="User avatar" />
 
             <div className="flex-grow">
                 <div className="flex items-center justify-between">
@@ -48,6 +43,10 @@ export default function Comment() {
                     </button>
                     <button className="flex cursor-pointer items-center space-x-2 hover:text-red-500">
                         <FaRegHeart className="h-4 w-4" />
+                        <span className="text-sm">0</span>
+                    </button>
+                    <button className="flex cursor-pointer items-center space-x-2 hover:text-neutral-600">
+                        <FaRegBookmark className="h-4 w-4" />
                         <span className="text-sm">0</span>
                     </button>
                 </div>

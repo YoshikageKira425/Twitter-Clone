@@ -10,17 +10,33 @@ class Comment extends Model
 
     protected $fillable = [
         'user_id',
-        'post_id',
+        'commentable_id',
+        'commentable_type',
         'content'
     ];
 
-    public function user()
+    public function commentable()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
-    public function tweet()
+    public function comments()
     {
-        return $this->belongsTo(Tweet::class);
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Likes::class, 'likeable');
+    }
+
+    public function retweets()
+    {
+        return $this->morphMany(Retweet::class, 'retweetable');
+    }
+
+    public function bookmarks()
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
     }
 }

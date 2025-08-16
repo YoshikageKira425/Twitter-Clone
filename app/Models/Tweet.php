@@ -24,21 +24,21 @@ class Tweet extends Model
 
     public function likes()
     {
-        return $this->hasMany(Likes::class);
+        return $this->morphMany(Likes::class, 'likeable');
     }
 
     public function retweets()
     {
-        return $this->hasMany(Retweet::class);
+        return $this->morphMany(Retweet::class, 'retweetable');
     }
 
     public function bookmarks()
     {
-        return $this->hasMany(Bookmark::class);
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
     }
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

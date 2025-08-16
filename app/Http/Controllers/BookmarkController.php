@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use App\Models\Tweet;
 use Illuminate\Support\Facades\Auth;
 
 class BookmarkController extends Controller
@@ -11,27 +13,57 @@ class BookmarkController extends Controller
         return Auth::user()->bookmarks()->with('post')->latest()->get();
     }
 
-    public function store()
+    public function store(string $type, int $id)
     {
         $user = Auth::user();
 
-        if ($user->bookmarks()->where('post_id', request()->postId)->exists()) {
-            return back()->with('error', 'You have already bookmarked this post.');
+        $model = $this->getModel($type, $id);
+
+        if (!$model) {
+            return back()->with('error', 'Invalid bookmarkable item.');
+        }
+
+        if ($user->bookmarks()->where('bookmarkable_id', $model->id)
+            ->where('bookmarkable_type', get_class($model))
+            ->exists()
+        ) {
+            return back()->with('error', 'You have already bookmarked this item.');
         }
 
         $user->bookmarks()->create([
-            "post_id" => request()->postId
+            'bookmarkable_id' => $model->id,
+            'bookmarkable_type' => get_class($model),
         ]);
 
-        return back()->with('success', 'Post bookmarked successfully.');
+        return back()->with('success', 'Item bookmarked successfully.');
     }
 
-    public function destroy()
+    public function destroy(string $type, int $id)
     {
         $user = Auth::user();
 
-        $user->bookmarks()->where('post_id', request()->postId)->delete();
+        $model = $this->getModel($type, $id);
 
-        return back()->with('success', 'Post unbookmarked successfully.');
+        if (!$model) {
+            return back()->with('error', 'Invalid item to unbookmark.');
+        }
+
+        $user->bookmarks()->where('bookmarkable_id', $model->id)
+            ->where('bookmarkable_type', get_class($model))
+            ->delete();
+
+        return back()->with('success', 'Item unbookmarked successfully.');
+    }
+
+    private function getModel(string $type, int $id)
+    {
+        switch ($type) {
+            case 'tweets':
+                return Tweet::findOrFail($id);
+            case 'comments':
+                return Comment::findOrFail($id);
+            default:
+                return null;
+        }
     }
 }

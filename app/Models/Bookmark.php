@@ -10,6 +10,8 @@ class Bookmark extends Model
 
     protected $fillable = [
         'user_id',
+        'bookmarkable_id',
+        'bookmarkable_type',
         'post_id'
     ];
 
@@ -18,8 +20,8 @@ class Bookmark extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tweet()
+    public function bookmarkble()
     {
-        return $this->belongsTo(Tweet::class);
+        return $this->morphTo();
     }
 }

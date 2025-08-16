@@ -11,12 +11,42 @@ class TweetController extends Controller
 {
     public function index()
     {
-        return Inertia::render("home", ["tweets" => Tweet::with('user')->get()]);
+        return Inertia::render("home", ["tweets" => $tweets = Tweet::with('user')
+            ->withCount([
+                'comments' => function ($query) {
+                    $query->where('commentable_type', Tweet::class);
+                },
+                'likes' => function ($query) {
+                    $query->where('likeable_type', Tweet::class);
+                },
+                'retweets' => function ($query) {
+                    $query->where('retweetable_type', Tweet::class);
+                },
+                'bookmarks' => function ($query) {
+                    $query->where('bookmarkable_type', Tweet::class);
+                }
+            ])
+            ->get()]);
     }
 
     public function show($id)
     {
-        return Inertia::render("tweet", ["tweet" => Tweet::with('user')->findOrFail($id)]);
+        return Inertia::render("tweet", ["tweet" => $tweet = Tweet::with('user')
+            ->withCount([
+                'comments' => function ($query) {
+                    $query->where('commentable_type', Tweet::class);
+                },
+                'likes' => function ($query) {
+                    $query->where('likeable_type', Tweet::class);
+                },
+                'retweets' => function ($query) {
+                    $query->where('retweetable_type', Tweet::class);
+                },
+                'bookmarks' => function ($query) {
+                    $query->where('bookmarkable_type', Tweet::class);
+                }
+            ])
+            ->findOrFail($id)]);
     }
 
     public function store(Request $request)

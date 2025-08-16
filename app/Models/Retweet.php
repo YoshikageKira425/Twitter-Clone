@@ -10,7 +10,8 @@ class Retweet extends Model
 
     protected $fillable = [
         'user_id',
-        'post_id',
+        'retweetable_id',
+        'retweetable_type',
         "comment"
     ];
 
@@ -19,8 +20,8 @@ class Retweet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tweet()
+    public function retweetable()
     {
-        return $this->belongsTo(Tweet::class);
+        return $this->morphTo();
     }
 }

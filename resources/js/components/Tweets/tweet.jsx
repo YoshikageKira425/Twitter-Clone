@@ -1,7 +1,8 @@
 import { BiDotsHorizontalRounded } from 'react-icons/bi';
-import { FaRegComment, FaRegHeart, FaRetweet } from 'react-icons/fa';
+import { FaRegComment, FaRegHeart, FaRetweet, FaRegBookmark } from 'react-icons/fa';
 
 export default function Tweet({ tweet }) {
+    console.log(tweet);
     const timeAgo = (date) => {
         const now = new Date();
         const commentDate = new Date(date);
@@ -17,6 +18,10 @@ export default function Tweet({ tweet }) {
         const diffInDays = Math.floor(diffInHours / 24);
         return `${diffInDays}d`;
     };
+
+    const like = () => {};
+    const retweet = () => {};
+    const bookmark = () => {};
 
     return (
         <div className="cursor-pointer border-b border-gray-800 p-4 transition-colors duration-200 hover:bg-neutral-900">
@@ -42,17 +47,21 @@ export default function Tweet({ tweet }) {
                     )}
 
                     <div className="mt-3 flex space-x-12 text-gray-500">
-                        <button className="flex cursor-pointer items-center space-x-2 hover:text-blue-500">
+                        <button onClick={like} className="flex cursor-pointer items-center space-x-2 hover:text-blue-500">
                             <FaRegComment className="h-4 w-4" />
-                            <span className="text-sm">0</span>
+                            <span className="text-sm">{tweet.comments_count}</span>
                         </button>
-                        <button className="flex cursor-pointer items-center space-x-2 hover:text-green-500">
+                        <button onClick={retweet} className="flex cursor-pointer items-center space-x-2 hover:text-green-500">
                             <FaRetweet className="h-4 w-4" />
-                            <span className="text-sm">0</span>
+                            <span className="text-sm">{tweet.retweets_count}</span>
                         </button>
-                        <button className="flex cursor-pointer items-center space-x-2 hover:text-red-500">
+                        <button onClick={like} className="flex cursor-pointer items-center space-x-2 hover:text-red-500">
                             <FaRegHeart className="h-4 w-4" />
-                            <span className="text-sm">0</span>
+                            <span className="text-sm">{tweet.likes_count}</span>
+                        </button>
+                        <button onClick={bookmark} className="flex cursor-pointer items-center space-x-2 hover:text-neutral-600">
+                            <FaRegBookmark className="h-4 w-4" />
+                            <span className="text-sm">{tweet.bookmarks_count}</span>
                         </button>
                     </div>
                 </a>
