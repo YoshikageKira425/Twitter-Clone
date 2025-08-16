@@ -11,7 +11,9 @@ class TweetController extends Controller
 {
     public function index()
     {
-        return Inertia::render("home", ["tweets" => $tweets = Tweet::with('user')
+        $userId = Auth::id();
+        
+        return Inertia::render("home", ["tweets" => Tweet::with('user')
             ->withCount([
                 'comments' => function ($query) {
                     $query->where('commentable_type', Tweet::class);
@@ -24,13 +26,26 @@ class TweetController extends Controller
                 },
                 'bookmarks' => function ($query) {
                     $query->where('bookmarkable_type', Tweet::class);
-                }
+                },
+            ])
+            ->withExists([
+                'likes as is_liked_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
+                'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
+                'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
             ])
             ->get()]);
     }
 
     public function show($id)
     {
+        $userId = Auth::id();
+        
         return Inertia::render("tweet", ["tweet" => $tweet = Tweet::with('user')
             ->withCount([
                 'comments' => function ($query) {
@@ -45,6 +60,17 @@ class TweetController extends Controller
                 'bookmarks' => function ($query) {
                     $query->where('bookmarkable_type', Tweet::class);
                 }
+            ])
+            ->withExists([
+                'likes as is_liked_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
+                'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
+                'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                },
             ])
             ->findOrFail($id)]);
     }

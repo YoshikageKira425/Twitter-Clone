@@ -1,4 +1,4 @@
-import { FaRegComment, FaRegHeart, FaRetweet } from 'react-icons/fa';
+import { FaRegComment, FaRegHeart, FaRetweet, FaRegBookmark } from 'react-icons/fa';
 
 export default function Comment() {
     // const formatTimestamp = (date) => {
@@ -47,7 +47,6 @@ export default function Comment() {
                     </button>
                     <button className="flex cursor-pointer items-center space-x-2 hover:text-neutral-600">
                         <FaRegBookmark className="h-4 w-4" />
-                        <span className="text-sm">0</span>
                     </button>
                 </div>
             </div>
