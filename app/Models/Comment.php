@@ -15,6 +15,11 @@ class Comment extends Model
         'content'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function commentable()
     {
         return $this->morphTo();
@@ -27,7 +32,7 @@ class Comment extends Model
 
     public function likes()
     {
-        return $this->morphMany(Likes::class, 'likeable');
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function retweets()

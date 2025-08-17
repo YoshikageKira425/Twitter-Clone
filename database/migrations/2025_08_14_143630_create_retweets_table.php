@@ -17,8 +17,6 @@ return new class extends Migration
             $table->morphs('retweetable');
             $table->text('comment')->nullable();
             $table->timestamps();
-
-            $table->unique(['user_id', 'post_id']);
         });
     }
 

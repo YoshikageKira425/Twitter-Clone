@@ -23,7 +23,7 @@ class BookmarkController extends Controller
             return back()->with('error', 'Invalid bookmarkable item.');
         }
 
-        if ($user->bookmarks()->where('bookmarkable_id', $model->id)
+        if ($user->bookmarks()->where('bookmarkable_id', $id)
             ->where('bookmarkable_type', get_class($model))
             ->exists()
         ) {
@@ -31,7 +31,7 @@ class BookmarkController extends Controller
         }
 
         $user->bookmarks()->create([
-            'bookmarkable_id' => $model->id,
+            'bookmarkable_id' => $id,
             'bookmarkable_type' => get_class($model),
         ]);
 
@@ -48,7 +48,7 @@ class BookmarkController extends Controller
             return back()->with('error', 'Invalid item to unbookmark.');
         }
 
-        $user->bookmarks()->where('bookmarkable_id', $model->id)
+        $user->bookmarks()->where('bookmarkable_id', $id)
             ->where('bookmarkable_type', get_class($model))
             ->delete();
 
@@ -60,7 +60,7 @@ class BookmarkController extends Controller
         switch ($type) {
             case 'tweets':
                 return Tweet::findOrFail($id);
-            case 'comments':
+            case 'comment':
                 return Comment::findOrFail($id);
             default:
                 return null;

@@ -23,15 +23,15 @@ class RetweetController extends Controller
             return back()->with('error', 'Invalid retweeted item.');
         }
 
-        if ($user->retweets()->where('bookmarkable_id', $model->id)
-            ->where('bookmarkable_type', get_class($model))
+        if ($user->retweets()->where('retweetable_id', $id)
+            ->where('retweetable_type', get_class($model))
             ->exists()
         ) {
             return back()->with('error', 'You have already retweeted this item.');
         }
 
         $user->retweets()->create([
-            'retweetable_id' => $model->id,
+            'retweetable_id' => $id,
             'retweetable_type' => get_class($model),
         ]);
 
@@ -48,7 +48,7 @@ class RetweetController extends Controller
             return back()->with('error', 'Invalid item to unretweeted.');
         }
 
-        $user->retweets()->where('retweetable_id', $model->id)
+        $user->retweets()->where('retweetable_id', $id)
             ->where('retweetable_type', get_class($model))
             ->delete();
 
@@ -60,7 +60,7 @@ class RetweetController extends Controller
         switch ($type) {
             case 'tweets':
                 return Tweet::findOrFail($id);
-            case 'comments':
+            case 'comment':
                 return Comment::findOrFail($id);
             default:
                 return null;

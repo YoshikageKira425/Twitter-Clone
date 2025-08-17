@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,7 @@ class LikeController extends Controller
 {
     public function index()
     {
-        return Auth::user()->bookmarks()->with('post')->latest()->get();
+        return response()->json(Auth::user()->likes()->with('likeable')->latest()->get());
     }
 
     public function store(string $type, int $id)
@@ -21,19 +22,13 @@ class LikeController extends Controller
         $model = $this->getModel($type, $id);
 
         if (!$model) {
-            return back()->with('error', 'Invalid likeable item.');
+            return back()->with('error', 'Invalid liked item.');
         }
 
-        if ($user->likes()->where('bookmarkable_id', $model->id)
-            ->where('bookmarkable_type', get_class($model))
-            ->exists()
-        ) {
-            return back()->with('error', 'You have already liked this item.');
-        }
-
-        $user->likes()->create([
+        Like::firstOrCreate([
             'likeable_id' => $model->id,
-            'likeable_type' => get_class($model),
+            'likeable_type' => $model->getMorphClass(),
+            'user_id' => $user->id,
         ]);
 
         return back()->with('success', 'Item liked successfully.');
@@ -49,8 +44,8 @@ class LikeController extends Controller
             return back()->with('error', 'Invalid item to unliked.');
         }
 
-        $user->bookmarks()->where('likeable_id', $model->id)
-            ->where('likeable_type', get_class($model))
+        $user->likes()->where('likeable_id', $model->id)
+            ->where('likeable_type', $model->getMorphClass())
             ->delete();
 
         return back()->with('success', 'Item unliked successfully.');
@@ -60,9 +55,9 @@ class LikeController extends Controller
     {
         switch ($type) {
             case 'tweets':
-                return Tweet::findOrFail($id);
-            case 'comments':
-                return Comment::findOrFail($id);
+                return Tweet::find($id);
+            case 'comment':
+                return Comment::find($id);
             default:
                 return null;
         }

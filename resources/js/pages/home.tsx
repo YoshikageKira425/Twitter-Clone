@@ -10,15 +10,25 @@ export default function Home() {
     const [allTweets, setAllTweets] = useState(tweets);
     const [tweet, setTweet] = useState('');
     const tweetContainer = useRef(null);
+    console.log('New tweet posted:', allTweets);
 
     const postTweet = async () => {
         try {
             const response = await axios.post('/api/posts', { content: tweet });
 
-            const newTweet = response.data.tweet;
+            let newTweet = response.data.tweet;
+
+            newTweet = {
+                ...newTweet,
+                is_liked_by_user: false,
+                is_retweeted_by_user: false,
+                is_bookmarked_by_user: false,
+                bookmarks_count: 0,
+                likes_count: 0,
+                retweets_count: 0,
+            };
 
             setAllTweets((prevTweets) => [newTweet, ...prevTweets]);
-            console.log(newTweet);
 
             setTweet('');
             alert(response.data.success);

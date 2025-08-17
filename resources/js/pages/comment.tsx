@@ -5,15 +5,19 @@ import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
+import Comment from '@/components/tweets/comment';
 
 export default function Home() {
-    const { auth, tweet, comments } = usePage<SharedData>().props;
+    const { auth, current_comment, comments, tweet } = usePage<SharedData>().props;
     const [comment, setComment] = useState('');
     const [allComments, setAllComments] = useState(comments);
 
+    console.log(current_comment);
+    console.log(comments);
+
     const postComment = async () => {
         try {
-            const response = await axios.post('/api/comments', { content: comment, commentable_id: tweet.id, commentable_type: "tweets" });
+            const response = await axios.post('/api/comments', { content: comment, commentable_id: current_comment.id, commentable_type: "comments" });
 
             setAllComments(prevComments => [response.data.comment, ...prevComments]);
 
@@ -33,6 +37,10 @@ export default function Home() {
 
             <div className="mr-[25%] ml-[20%] w-3/5 flex-grow border-r border-gray-800 bg-black">
                 <Tweet tweet={tweet} />
+        
+                <div className='mt-20 border-b border-gray-800'></div>
+
+                <Comment comment={current_comment} />
 
                 <div className="flex border-b border-gray-800 p-4">
                     <div className="flex w-full">

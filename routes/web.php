@@ -14,7 +14,10 @@ use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TweetController::class, 'index'])->name('home');
+    
     Route::get('/tweet/{id}', [TweetController::class, "show"]);
+    Route::get('/tweet/{postId}/comment/{commentId}', [CommentController::class, "show"])->name('comment.show');
+
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get("/account/{username}", [UserController::class, 'index'])->name("user.index");
 

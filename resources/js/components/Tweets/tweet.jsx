@@ -1,14 +1,23 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegComment, FaRegHeart, FaRetweet } from 'react-icons/fa';
 
 export default function Tweet({ tweet }) {
-    const [like, setLike] = useState(tweet.is_liked_by_user);
-    const [retweet, setRetweet] = useState(tweet.is_retweeted_by_user);
-    const [bookmark, setBookmark] = useState(tweet.is_bookmarked_by_user);
+    const [like, setLike] = useState(false);
+    const [retweet, setRetweet] = useState(false);
+    const [bookmark, setBookmark] = useState(false);
+    const [commentCount, setCommentCount] = useState(0);
+    const [likeCount, setLikeCount] = useState(0);
+    const [retweetCount, setRetweetCount] = useState(0);
 
-    const [likeCount, setLikeCount] = useState(tweet.likes_count);
-    const [retweetCount, setRetweetCount] = useState(tweet.retweets_count);
+    useEffect(() => {
+        setLike(tweet.is_liked_by_user || false);
+        setRetweet(tweet.is_retweeted_by_user || false);
+        setBookmark(tweet.is_bookmarked_by_user || false);
+        setLikeCount(tweet.likes_count || 0);
+        setRetweetCount(tweet.retweets_count || 0);
+        setCommentCount(tweet.comments_count || 0);
+    }, [tweet]);
 
     const timeAgo = (date) => {
         const now = new Date();
@@ -83,7 +92,7 @@ export default function Tweet({ tweet }) {
                     <div className="mt-3 flex space-x-12 text-gray-500">
                         <a href={`/tweet/${tweet.id}`} className="flex cursor-pointer items-center space-x-2 hover:text-blue-500">
                             <FaRegComment className="h-4 w-4" />
-                            <span className="text-sm">{tweet.comments_count}</span>
+                            <span className="text-sm">{commentCount}</span>
                         </a>
                         <button
                             onClick={retweetClick}
