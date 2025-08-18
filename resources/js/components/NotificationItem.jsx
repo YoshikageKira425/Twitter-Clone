@@ -1,4 +1,4 @@
-import { FaHeart, FaRetweet, FaUserPlus } from 'react-icons/fa';
+import { FaHeart, FaRetweet, FaUserPlus, FaBookmark } from 'react-icons/fa';
 import { MdAlternateEmail } from 'react-icons/md';
 
 export default function NotificationItem({ notification }) {
@@ -39,6 +39,14 @@ export default function NotificationItem({ notification }) {
                 </p>
             );
             break;
+        case 'bookmark':
+            icon = <FaBookmark className='text-white' />;
+            message = (
+                <p className="mt-1">
+                    <span className="font-bold">{user.name}</span> bookmark your post.
+                </p>
+            );
+            break;
         case 'mention':
             icon = <MdAlternateEmail className='text-blue-500' />;
             message = (
@@ -65,7 +73,7 @@ export default function NotificationItem({ notification }) {
             <div className="mr-4 flex-shrink-0">{icon}</div>
             <div className="flex-grow">
                 <div className="flex items-center">
-                    <img className="mr-3 h-10 w-10 rounded-full" src={user.profile_image_url} alt="User avatar" />
+                    <img className="mr-3 h-10 w-10 rounded-full" src={user.profile_image} alt="User avatar" />
                     <div>
                         {message}
                         {data && <p className="mt-1 text-gray-500">{data}</p>}

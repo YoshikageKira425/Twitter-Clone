@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Notification;
 use App\Models\Tweet;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,6 +30,13 @@ class BookmarkController extends Controller
         ) {
             return back()->with('error', 'You have already bookmarked this item.');
         }
+
+        Notification::create([
+            'to_user_id' => $model->user_id,
+            'user_id' => $user->id,
+            'type' => 'bookmark',
+            'data' => "You have a new retweeted on your {$type} by {$user->name}",
+        ]);
 
         $user->bookmarks()->create([
             'bookmarkable_id' => $id,

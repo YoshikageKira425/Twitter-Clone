@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\Notification;
 use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,13 @@ class LikeController extends Controller
             'likeable_id' => $model->id,
             'likeable_type' => $model->getMorphClass(),
             'user_id' => $user->id,
+        ]);
+
+        Notification::create([
+            'to_user_id' => $model->user_id,
+            'user_id' => $user->id,
+            'type' => 'like',
+            'data' => "You have a new like on your {$type} by {$user->name}",
         ]);
 
         return back()->with('success', 'Item liked successfully.');
