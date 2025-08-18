@@ -4,17 +4,42 @@ import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useRef, useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 
 export default function Home() {
     const { auth, tweets } = usePage<SharedData>().props;
     const [allTweets, setAllTweets] = useState(tweets);
     const [tweet, setTweet] = useState('');
     const tweetContainer = useRef(null);
-    console.log('New tweet posted:', allTweets);
+    const [photo, setPhoto] = useState<string | null>(null);
+
+    const handlePhotoUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhoto(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const postTweet = async () => {
         try {
-            const response = await axios.post('/api/posts', { content: tweet });
+            const formData = new FormData();
+            if (tweet) {
+                formData.append('content', tweet);
+            }
+            const file = document.getElementById('photo-upload')?.files[0];
+            if (file) {
+                formData.append('image', file);
+            }
+
+            const response = await axios.post('/api/posts', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
             let newTweet = response.data.tweet;
 
@@ -62,10 +87,39 @@ export default function Home() {
                             className="h-12 w-full resize-none bg-transparent p-2 text-lg placeholder-gray-500 outline-none"
                             placeholder="What is happening?!"
                         />
-                        <div className="mt-2 flex items-center justify-between">
-                            <button onClick={postTweet} className="rounded-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600">
+
+                        {photo && (
+                            <div className="mt-2">
+                                <img src={photo} alt="preview" className="max-h-60 rounded-lg" />
+                            </div>
+                        )}
+
+                        <div className="mt-2 flex items-center gap-3">
+                            <button
+                                onClick={postTweet}
+                                className="rounded-full bg-blue-500 px-4 py-2 font-bold text-white transition-colors duration-200 hover:bg-blue-600"
+                            >
                                 Post
                             </button>
+
+                            <label
+                                htmlFor="photo-upload"
+                                className="cursor-pointer rounded-full p-3 text-center text-blue-500 transition-colors duration-200 hover:bg-blue-600 hover:text-white"
+                            >
+                                <FaPlus />
+                                <input
+                                    id="photo-upload"
+                                    name="photo-upload"
+                                    type="file"
+                                    hidden
+                                    id="photo-upload"
+                                    name="photo-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    hidden
+                                    onChange={handlePhotoUpload}
+                                />
+                            </label>
                         </div>
                     </div>
                 </div>

@@ -110,8 +110,8 @@ class TweetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'content' => 'required|string|max:280',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'content' => 'required_without:image|string|max:280',
+            'image'   => 'required_without:content|image|mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
         $imagePath = null;
@@ -120,8 +120,8 @@ class TweetController extends Controller
         }
 
         $newTweet = Auth::user()->tweets()->create([
-            'content' => $request->content,
-            'image' => $imagePath,
+            'content' => $request->content ?? "",
+            'image' => asset('storage/' . $imagePath) ?? "",
         ]);
 
         $newTweet->load('user');
