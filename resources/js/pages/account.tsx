@@ -22,9 +22,9 @@ export default function Account() {
                         <div>
                             <h2 className="text-2xl font-bold">{user.name}</h2>
                             {auth.user.id === user.id && (
-                                <button className="mt-2 rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600">
+                                <a href='/settings/profile' className="mt-2 rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600">
                                     Edit Profile
-                                </button>
+                                </a>
                             )}
                         </div>
                     </div>
