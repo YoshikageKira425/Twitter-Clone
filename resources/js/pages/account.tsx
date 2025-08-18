@@ -16,7 +16,7 @@ export default function Account() {
             </div>
 
             <div className="mr-[25%] ml-[20%] w-3/5 flex-grow border-r border-gray-800 bg-black">
-                <div className="border-b border-gray-800 bg-neutral-900 p-6">
+                <div className="border-b border-gray-800 p-6">
                     <div className="flex items-center space-x-6">
                         <img className="h-24 w-24 rounded-full border-2 border-gray-700" src={user.profile_image} alt={`${user.name}'s avatar`} />
                         <div>
@@ -37,7 +37,19 @@ export default function Account() {
                     </div>
                 </div>
 
-                <div>{tweets.length > 0 && tweets.map((tweet, index) => <Tweet key={index} tweet={tweet} />)}</div>
+                <div className="flex flex-row justify-between space-y-4 border-b border-gray-800">
+                    <a href={`/account/${user.name}`} className="m-0 text-center h-full w-full border-r border-gray-800 p-3 transition-colors duration-200 hover:bg-neutral-900">Tweets</a>
+                    <a href={`/account/${user.name}/comments`} className="m-0 text-center h-full w-full border-r border-gray-800 p-3 transition-colors duration-200 hover:bg-neutral-900">Comments</a>
+                    <a href={`/account/${user.name}/retweet`} className="m-0 text-center h-full w-full p-3 transition-colors duration-200 hover:bg-neutral-900">Retweet</a>
+                </div>
+
+                <div>
+                    {tweets.length > 0 ? (
+                        tweets.map((tweet, index) => <Tweet key={index} tweet={tweet} />)
+                    ) : (
+                        <div className="p-4 text-gray-500">No tweets available.</div>
+                    )}
+                </div>
             </div>
 
             <div className="fixed top-0 right-0 h-full w-1/4 overflow-y-auto border-l border-gray-800 bg-black">

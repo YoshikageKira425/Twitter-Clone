@@ -20,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get("/account/{username}", [UserController::class, 'index'])->name("user.index");
+    Route::get("/account/{username}/comments", [UserController::class, 'comment'])->name("user.comment");
+    Route::get("/account/{username}/retweet", [UserController::class, 'retweet'])->name("user.retweet");
 
     Route::prefix('api')->group(function () {
         Route::get('/feed', [TweetController::class, 'feed']);
