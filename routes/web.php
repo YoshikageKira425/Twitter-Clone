@@ -27,7 +27,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/feed', [TweetController::class, 'feed']);
         Route::resource('posts', TweetController::class)->only(['update', 'store', 'destroy']);
 
-        Route::resource('comments', CommentController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('comments', CommentController::class)->only(['store', 'destroy']);
 
         Route::post('/{type}/{id}/like', [LikeController::class, 'store']);
         Route::delete('/{type}/{id}/like', [LikeController::class, 'destroy']);
@@ -40,8 +40,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/users/{user}/follow', [FollowController::class, 'store']);
         Route::delete('/users/{user}/follow', [FollowController::class, 'destroy']);
-
-        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     });
 });
 

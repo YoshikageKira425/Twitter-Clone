@@ -17,7 +17,14 @@ class UserController extends Controller
         $userId = Auth::id();
 
         return Inertia::render("account", [
-            "user" => User::with('tweets')->firstWhere('name', $username),
+            "user" => User::withCount(['followers', 'following'])
+                ->withExists([
+                    'followers as is_followed' => function ($query) {
+                        $query->where('follower_id', Auth::id());
+                    }
+                ])
+                ->where('name', $username)
+                ->firstOrFail(),
             "tweets" => Tweet::whereHas('user', function ($query) use ($username) {
                 $query->where('name', $username);
             })->withCount([
@@ -52,7 +59,14 @@ class UserController extends Controller
         $userId = Auth::id();
 
         return Inertia::render("account", [
-            "user" => User::with('tweets')->firstWhere('name', $username),
+            "user" => User::withCount(['followers', 'following'])
+                ->withExists([
+                    'followers as is_followed_by_auth' => function ($query) {
+                        $query->where('follower_id', Auth::id());
+                    }
+                ])
+                ->where('name', $username)
+                ->firstOrFail(),
             "tweets" => Comment::whereHas('user', function ($query) use ($username) {
                 $query->where('name', $username);
             })->withCount([
@@ -87,7 +101,14 @@ class UserController extends Controller
         $userId = Auth::id();
 
         return Inertia::render("account", [
-            "user" => User::with('tweets')->firstWhere('name', $username),
+            "user" => User::withCount(['followers', 'following'])
+                ->withExists([
+                    'followers as is_followed_by_auth' => function ($query) {
+                        $query->where('follower_id', Auth::id());
+                    }
+                ])
+                ->where('name', $username)
+                ->firstOrFail(),
             "tweets" => Tweet::with('user')
                 ->withCount([
                     'comments',
