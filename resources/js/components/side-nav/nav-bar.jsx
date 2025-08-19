@@ -30,7 +30,7 @@ export default function NavBar() {
                         </a>
                     </li>
                     <li>
-                        <a href="/" className="flex items-center gap-4 rounded-full px-4 py-3 transition duration-200 hover:bg-neutral-800">
+                        <a href="/explore" className="flex items-center gap-4 rounded-full px-4 py-3 transition duration-200 hover:bg-neutral-800">
                             <FiHash className="h-6 w-6" />
                             <span className="text-xl font-medium">Explore</span>
                         </a>

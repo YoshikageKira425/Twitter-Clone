@@ -4,7 +4,7 @@ import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import LeftBar from '@/components/side-nav/left-bar.jsx';
 
-export default function Home() {
+export default function Notification() {
     const { auth, notifications } = usePage<SharedData>().props;
 
     console.log(notifications);

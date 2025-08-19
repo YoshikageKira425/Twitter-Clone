@@ -135,4 +135,19 @@ class UserController extends Controller
                 ->get()
         ]);
     }
+
+    public function getUser()
+    {
+        $search = request()->query('search');
+
+        $users = User::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->limit(5)
+            ->get();
+
+        return response()->json($users);
+    }
 }

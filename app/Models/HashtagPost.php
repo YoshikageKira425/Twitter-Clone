@@ -8,5 +8,5 @@ class HashtagPost extends Model
 {
     protected $table = 'hashtag_tweet';
 
-    protected $fillable = ['hashtag_id', ''];
+    protected $fillable = ['hashtag_id', 'tweet_id'];
 }

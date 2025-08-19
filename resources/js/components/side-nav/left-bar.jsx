@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import Hashtag from '@/components/side-nav/hashtag';
 
 export default function LeftBar() {
     const [hashtags, setHashtags] = useState([]);
-    console.log(hashtags);
 
     useEffect(() => {
         axios
@@ -19,18 +19,9 @@ export default function LeftBar() {
     return (
         <div className="p-4">
             <h3 className="text-xl font-bold">What's happening</h3>
-            {hashtags.length > 0 &&
-                hashtags.map((hashtag) => (Hashtag(hashtag)))
-            }
+            {hashtags.length > 0 && hashtags.map((hashtag, index) => <Hashtag key={index} name={hashtag.name} usage_count={hashtag.tweets_count} />)}
         </div>
     );
 }
 
-function Hashtag({ name, usage_count }) {
-    return (
-        <div className="mt-4 rounded-xl bg-gray-900 p-4">
-            <p className="text-gray-400">#{name}</p>
-            <p className="text-sm text-gray-500">{usage_count} posts</p>
-        </div>
-    );
-}
+

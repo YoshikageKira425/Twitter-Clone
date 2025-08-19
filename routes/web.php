@@ -9,23 +9,34 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HashtagController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TweetController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [TweetController::class, 'index'])->name('home');
-    
+
+    Route::get('/explore', function () {
+        return Inertia::render('explore');
+    })->name('explore');
+
     Route::get('/tweet/{id}', [TweetController::class, "show"]);
     Route::get('/tweet/{postId}/comment/{commentId}', [CommentController::class, "show"])->name('comment.show');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
     Route::get("/account/{username}", [UserController::class, 'index'])->name("user.index");
     Route::get("/account/{username}/comments", [UserController::class, 'comment'])->name("user.comment");
     Route::get("/account/{username}/retweet", [UserController::class, 'retweet'])->name("user.retweet");
 
+    Route::get("/hashtag/{hashtag}", [HashtagController::class, 'show'])->name('hashtag.show');
+
     Route::prefix('api')->group(function () {
         Route::get('/hashtags', [HashtagController::class, 'index'])->name('hashtags.index');
+
+        Route::get('/users', [UserController::class, "getUser"]);
 
         Route::resource('posts', TweetController::class)->only(['update', 'store', 'destroy']);
 
@@ -42,6 +53,12 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/users/{user}/follow', [FollowController::class, 'store']);
         Route::delete('/users/{user}/follow', [FollowController::class, 'destroy']);
+
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/selected-user', [SessionController::class, 'storeSelectedUser']);
+            Route::get('/selected-user', [SessionController::class, 'getSelectedUser']);
+            Route::delete('/selected-user', [SessionController::class, 'clearSelectedSearch']);
+        });
     });
 });
 
