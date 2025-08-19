@@ -19,7 +19,7 @@ export default function LeftBar() {
     return (
         <div className="p-4">
             <h3 className="text-xl font-bold">What's happening</h3>
-            {hashtags.length > 0 && hashtags.map((hashtag, index) => <Hashtag key={index} name={hashtag.name} usage_count={hashtag.tweets_count} />)}
+            {hashtags.length > 0 && hashtags.map((hashtag, index) => <Hashtag key={index} hashtag={hashtag} />)}
         </div>
     );
 }

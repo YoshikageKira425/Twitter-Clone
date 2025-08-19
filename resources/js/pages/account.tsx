@@ -51,21 +51,24 @@ export default function Account() {
                                     Edit Profile
                                 </a>
                             )}
-                            {auth.user.id !== user.id && !following ? (
-                                <button
-                                    onClick={handleFollow}
-                                    className="mt-2 rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600"
-                                >
-                                    Follow
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleUnfollow}
-                                    className="mt-2 rounded-full border-2 border-black bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:border-blue-500 hover:bg-black hover:text-blue-500"
-                                >
-                                    Unfollow
-                                </button>
-                            )}
+                            {
+                                auth.user.id !== user.id &&
+                                    (following ? (
+                                        <button
+                                            onClick={handleUnfollow}
+                                            className="mt-2 rounded-full border-2 border-black bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:border-blue-500 hover:bg-black hover:text-blue-500"
+                                        >
+                                            Unfollow
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleFollow}
+                                            className="mt-2 rounded-full bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-blue-600"
+                                        >
+                                            Follow
+                                        </button>
+                                    ))
+                            }
                         </div>
                     </div>
                     <div className="mt-6 text-gray-400">
