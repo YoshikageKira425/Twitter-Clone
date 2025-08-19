@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Hashtag;
+use App\Models\HashtagPost;
 use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -119,10 +121,25 @@ class TweetController extends Controller
             $imagePath = $request->file('image')->store('tweet_images', 'public');
         }
 
+        preg_match_all('/#([\p{L}\p{N}_]+)/u', $request->content ?? "", $matches);
+
         $newTweet = Auth::user()->tweets()->create([
             'content' => $request->content ?? "",
-            'image' => asset('storage/' . $imagePath) ?? "",
+            'image'   => $imagePath ? asset('storage/' . $imagePath) : "",
         ]);
+
+        if (!empty($matches[1])) {
+            $hashtags = array_unique($matches[1]);
+
+            foreach ($hashtags as $hashtag) {
+                $hashtagModel = Hashtag::firstOrCreate(['name' => $hashtag]);
+                
+                HashtagPost::create([
+                    'hashtag_id' => $hashtagModel->id,
+                    'tweet_id' => $newTweet->id,
+                ]);
+            }
+        }
 
         $newTweet->load('user');
 
@@ -132,46 +149,46 @@ class TweetController extends Controller
         ], 201);
     }
 
-    public function edit($id)
-    {
-        $tweet = Tweet::findOrFail($id);
+    // public function edit($id)
+    // {
+    //     $tweet = Tweet::findOrFail($id);
 
-        if (Auth::id() !== $tweet->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
+    //     if (Auth::id() !== $tweet->user_id) {
+    //         abort(403, 'Unauthorized action.');
+    //     }
 
-        return view('tweets.edit', compact('tweet'));
-    }
+    //     return view('tweets.edit', compact('tweet'));
+    // }
 
-    public function update(Request $request, $id)
-    {
-        $tweet = Tweet::findOrFail($id);
+    // public function update(Request $request, $id)
+    // {
+    //     $tweet = Tweet::findOrFail($id);
 
-        if (Auth::id() !== $tweet->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
+    //     if (Auth::id() !== $tweet->user_id) {
+    //         abort(403, 'Unauthorized action.');
+    //     }
 
-        $request->validate([
-            'content' => 'required|string|max:280',
-        ]);
+    //     $request->validate([
+    //         'content' => 'required|string|max:280',
+    //     ]);
 
-        $tweet->update([
-            'content' => $request->content,
-        ]);
+    //     $tweet->update([
+    //         'content' => $request->content,
+    //     ]);
 
-        return redirect()->route('tweets.show', $tweet)->with('success', 'Tweet updated successfully.');
-    }
+    //     return redirect()->route('tweets.show', $tweet)->with('success', 'Tweet updated successfully.');
+    // }
 
-    public function destroy($id)
-    {
-        $tweet = Tweet::findOrFail($id);
+    // public function destroy($id)
+    // {
+    //     $tweet = Tweet::findOrFail($id);
 
-        if (Auth::id() !== $tweet->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
+    //     if (Auth::id() !== $tweet->user_id) {
+    //         abort(403, 'Unauthorized action.');
+    //     }
 
-        $tweet->delete();
+    //     $tweet->delete();
 
-        return redirect()->route('tweets.index')->with('success', 'Tweet deleted successfully.');
-    }
+    //     return redirect()->route('tweets.index')->with('success', 'Tweet deleted successfully.');
+    // }
 }

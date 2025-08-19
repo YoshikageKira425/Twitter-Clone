@@ -7,6 +7,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RetweetController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\HashtagController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TweetController;
 use App\Http\Controllers\UserController;
@@ -24,7 +25,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/account/{username}/retweet", [UserController::class, 'retweet'])->name("user.retweet");
 
     Route::prefix('api')->group(function () {
-        Route::get('/feed', [TweetController::class, 'feed']);
+        Route::get('/hashtags', [HashtagController::class, 'index'])->name('hashtags.index');
+
         Route::resource('posts', TweetController::class)->only(['update', 'store', 'destroy']);
 
         Route::resource('comments', CommentController::class)->only(['store', 'destroy']);

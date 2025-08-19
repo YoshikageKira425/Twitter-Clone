@@ -5,6 +5,7 @@ import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
+import LeftBar from '@/components/side-nav/left-bar.jsx';
 
 export default function Home() {
     const { auth, tweet, comments } = usePage<SharedData>().props;
@@ -50,13 +51,7 @@ export default function Home() {
             </div>
 
             <div className="fixed top-0 right-0 h-full w-1/4 overflow-y-auto border-l border-gray-800 bg-black">
-                <div className="p-4">
-                    <h3 className="text-xl font-bold">What's happening</h3>
-                    <div className="mt-4 rounded-xl bg-gray-900 p-4">
-                        <p className="text-gray-400">#Topic1</p>
-                        <p className="text-sm text-gray-500">2.5K posts</p>
-                    </div>
-                </div>
+                <LeftBar />
             </div>
         </div>
     );
