@@ -3,6 +3,7 @@ import { BiHomeCircle } from 'react-icons/bi';
 import { BsTwitterX } from 'react-icons/bs';
 import { FiBell, FiHash, FiLogOut } from 'react-icons/fi';
 import axios from 'axios';
+import { MdAdminPanelSettings } from "react-icons/md";
 
 export default function NavBar() {
     const { auth } = usePage().props;
@@ -10,8 +11,6 @@ export default function NavBar() {
     const logOut = async () => {
         if (confirm("Are you sure you want to log out?")) {
             await axios.post('logout');
-
-            window.location.href = '/login'; 
         }
     };
     
@@ -54,6 +53,14 @@ export default function NavBar() {
                             <span className="text-xl font-medium">Profile</span>
                         </a>
                     </li>
+                    {auth.user.is_admin && (
+                        <li>
+                            <a href="/admin" className="flex items-center gap-4 rounded-full px-4 py-3 transition duration-200 hover:bg-neutral-800">
+                                <MdAdminPanelSettings className="h-6 w-6" />
+                                <span className="text-xl font-medium">Admin Panel</span>
+                            </a>
+                        </li>
+                    )}
                     <li>
                         <button onClick={logOut}
                             className="flex items-center gap-4 rounded-full  w-full px-4 py-3 transition duration-200 hover:bg-neutral-800"
