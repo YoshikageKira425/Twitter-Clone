@@ -10,7 +10,7 @@ export default function NavBar() {
 
     const logOut = async () => {
         if (confirm("Are you sure you want to log out?")) {
-            await axios.post('logout');
+            await axios.post('/logout');
         }
     };
     

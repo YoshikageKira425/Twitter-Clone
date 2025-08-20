@@ -16,6 +16,10 @@ export default function Notification() {
             </div>
 
             <div className="mr-[25%] ml-[20%] w-3/5 flex-grow border-r bg-black border-gray-800">
+                <div className="sticky top-0 z-10 border-b border-gray-800 bg-black/50 p-4 backdrop-blur-md">
+                    <h2 className="text-xl font-bold">Notifications</h2>
+                </div>
+
                 {notifications.length > 0 && notifications.map((notification, index) => (
                     <NotificationItem key={index} notification={notification} />
                 ))}

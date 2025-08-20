@@ -17,7 +17,7 @@ class UserController extends Controller
         $userId = Auth::id();
 
         return Inertia::render("account", [
-            "user" => User::withCount(['followers', 'following'])
+            "user" => User::with(['followers', 'following'])
                 ->withExists([
                     'followers as is_followed' => function ($query) {
                         $query->where('follower_id', Auth::id());
