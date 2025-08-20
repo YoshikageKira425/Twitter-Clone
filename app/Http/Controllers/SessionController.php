@@ -9,17 +9,16 @@ class SessionController extends Controller
 {
     public function getSelectedUser()
     {
-        return request()->json(request()->session()->get('user_search', []));
         $users_id = request()->session()->get('user_search', []);
 
         if (empty($users_id)) {
             return response()->json([]);
         }
 
-        // $users = User::whereIn('id', $users_id)
-        //     ->get();
+        $users = User::whereIn('id', $users_id)
+            ->get();
 
-        return request()->json($users_id);
+        return response()->json($users);
     }
     public function storeSelectedUser()
     {

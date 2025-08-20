@@ -6,8 +6,6 @@ import Tweet from '@/components/tweets/tweet';
 
 export default function Hashtag() {
     const { auth, hashtag, tweets } = usePage<SharedData>().props;
-    console.log('Hashtag:', hashtag);
-    console.log('Tweets:', tweets);
 
     return (
         <div className="flex h-screen bg-black text-gray-100">

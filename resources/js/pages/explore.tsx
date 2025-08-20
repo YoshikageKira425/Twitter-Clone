@@ -1,7 +1,5 @@
 import Hashtag from '@/components/side-nav/hashtag';
 import NavBar from '@/components/side-nav/nav-bar.jsx';
-import { type SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
@@ -10,7 +8,7 @@ export default function Notification() {
     const [search, setSearch] = useState('');
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState([]);
-    const [showResults, setShowResults] = useState(false); 
+    const [showResults, setShowResults] = useState(false);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -27,8 +25,8 @@ export default function Notification() {
             .get('/api/selected-user')
             .then((response) => {
                 setSelectedUser(response.data);
-                console.log('Selected User:', response.data);
-            }).catch((error) => {
+            })
+            .catch((error) => {
                 console.error('Error fetching selected user:', error);
             });
     }, []);
@@ -64,6 +62,11 @@ export default function Notification() {
             setShowResults(false);
         }, 200);
     };
+
+    const clearUsers = async () => {
+        setSelectedUser([]);
+        await axios.post('/api/selected-user', { _method: 'DELETE'  });
+    }
 
     return (
         <div className="flex h-screen bg-black text-gray-100">
@@ -118,10 +121,36 @@ export default function Notification() {
                     </div>
                 )}
 
+                {search.trim() == '' && showResults && (
+                    <div className="fixed top-14 left-50 z-10 w-3/5">
+                        <div className="flex max-h-80 w-[60%] translate-x-1/2 flex-col items-center overflow-auto rounded-b-md bg-gray-800 shadow-lg">
+                            {selectedUser.length > 0 && (
+                                <div className="px-4 py-2 text-white flex justify-between w-full">
+                                    <h1 className='font-bold text-xl'>Recent</h1>
+                                    <button onClick={clearUsers} className='text-blue-700 text-lg cursor-pointer font-semibold'>Clear</button>
+                                </div>
+                            )}
+                            {selectedUser.length > 0 ? (
+                                selectedUser.map((user, index) => (
+                                    <button
+                                        onClick={() => userButton(user)}
+                                        key={index}
+                                        className="flex w-full items-center gap-3 px-4 py-2 text-white transition hover:bg-gray-700"
+                                    >
+                                        <img src={user.profile_image} alt={user.name} className="h-10 w-10 rounded rounded-full object-cover" />
+                                        <span className="truncate">{user.name}</span>
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="px-4 py-2 text-neutral-400">Nothing found.</div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-4">
                     <h3 className="text-xl font-bold">What's happening</h3>
-                    {hashtags.length > 0 &&
-                        hashtags.map((hashtag, index) => <Hashtag key={index} hashtag={hashtag} />)}
+                    {hashtags.length > 0 && hashtags.map((hashtag, index) => <Hashtag key={index} hashtag={hashtag} />)}
                 </div>
             </div>
 
