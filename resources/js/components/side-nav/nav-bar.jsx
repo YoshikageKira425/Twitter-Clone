@@ -53,14 +53,14 @@ export default function NavBar() {
                             <span className="text-xl font-medium">Profile</span>
                         </a>
                     </li>
-                    {auth.user.is_admin && (
+                    {auth.user.is_admin ? (
                         <li>
                             <a href="/admin" className="flex items-center gap-4 rounded-full px-4 py-3 transition duration-200 hover:bg-neutral-800">
                                 <MdAdminPanelSettings className="h-6 w-6" />
                                 <span className="text-xl font-medium">Admin Panel</span>
                             </a>
                         </li>
-                    )}
+                    ) : null}
                     <li>
                         <button onClick={logOut}
                             className="flex items-center gap-4 rounded-full  w-full px-4 py-3 transition duration-200 hover:bg-neutral-800"

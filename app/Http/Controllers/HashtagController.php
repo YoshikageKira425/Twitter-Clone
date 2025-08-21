@@ -27,32 +27,27 @@ class HashtagController extends Controller
     {
         $userId = Auth::id();
 
+        $hashtagModel = Hashtag::where('name', $hashtag)
+            ->with([
+                'tweets' => fn($query) => $query->withCount([
+                    'comments',
+                    'likes',
+                    'retweets',
+                    'bookmarks'
+                ])
+                    ->withExists([
+                        'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+                        'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+                        'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+                    ])
+                    ->with('user')
+                    ->latest()
+            ])
+            ->firstOrFail();
+
         return Inertia::render('hashtag', [
-            'hashtag' => $hashtag,
-            'tweets' => Hashtag::where('name', $hashtag)->firstOrFail()->tweets()->withCount([
-                'comments' => function ($query) {
-                    $query->where('commentable_type', Tweet::class);
-                },
-                'likes' => function ($query) {
-                    $query->where('likeable_type', Tweet::class);
-                },
-                'retweets' => function ($query) {
-                    $query->where('retweetable_type', Tweet::class);
-                },
-                'bookmarks' => function ($query) {
-                    $query->where('bookmarkable_type', Tweet::class);
-                }
-            ])->withExists([
-                'likes as is_liked_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId)->where('likeable_type', Tweet::class);
-                },
-                'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId)->where('retweetable_type', Tweet::class);
-                },
-                'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId)->where('bookmarkable_type', Tweet::class);
-                },
-            ])->with('user')->latest()->get(),
+            'hashtag' => $hashtagModel->name,
+            'tweets' => $hashtagModel->tweets,
         ]);
     }
 }
