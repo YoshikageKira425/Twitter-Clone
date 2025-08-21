@@ -23,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('explore');
 
     Route::get('/tweet/{id}', [TweetController::class, "show"]);
-    Route::get('/tweet/{postId}/comment/{commentId}', [CommentController::class, "show"])->name('comment.show');
+    Route::get('/comment/{commentId}', [CommentController::class, "show"])->name('comment.show');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 

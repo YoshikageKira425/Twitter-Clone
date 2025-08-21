@@ -7,6 +7,8 @@ use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use function Pest\Laravel\get;
+
 class CommentController extends Controller
 {
     public function index()
@@ -14,91 +16,144 @@ class CommentController extends Controller
         return Tweet::firstWhere("id", request()->postId)->comments()->get();
     }
 
-    public function show($commentId, $postId)
+    // public function show($commentId, $postId)
+    // {
+    //     $userId = Auth::id();
+
+    //     return inertia()->render('comment', [
+    //         'tweet' => Tweet::select(
+    //             'tweets.id',
+    //             'tweets.content',
+    //             'tweets.image',
+    //             'tweets.user_id',
+    //             'tweets.created_at'
+    //         )
+    //             ->withExists([
+    //                 'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //             ])
+    //             ->withCount([
+    //                 'likes as likes_count',
+    //                 'comments as comments_count',
+    //                 'retweets as retweets_count',
+    //             ])
+    //             ->with('user')
+    //             ->findOrFail($postId),
+
+    //         'current_comment' => Comment::select(
+    //             'comments.id',
+    //             'comments.content',
+    //             'comments.user_id',
+    //             'comments.commentable_id',
+    //             'comments.created_at'
+    //         )
+    //             ->withExists([
+    //                 'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //             ])
+    //             ->withCount([
+    //                 'likes as likes_count',
+    //                 'comments as comments_count',
+    //                 'retweets as retweets_count',
+    //             ])
+    //             ->with('user')
+    //             ->findOrFail($commentId),
+
+    //         'comments' => Comment::select(
+    //             'comments.id',
+    //             'comments.content',
+    //             'comments.user_id',
+    //             'comments.commentable_id',
+    //             'comments.created_at'
+    //         )
+    //             ->where('comments.commentable_id', $commentId)
+    //             ->where('comments.commentable_type', 'App\Models\Comment')
+    //             ->withExists([
+    //                 'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+    //                 'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+    //             ])
+    //             ->withCount([
+    //                 'likes as likes_count',
+    //                 'comments as comments_count',
+    //                 'retweets as retweets_count',
+    //             ])
+    //             ->with('user')
+    //             ->get(),
+    //     ]);
+    // }
+
+    public function show($commentId)
     {
-        $userId = Auth::id();
+        $userId = Auth::id(); 
+
+        $currentComment = Comment::withExists([
+            'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+            'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+            'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+        ])
+            ->withCount([
+                'likes as likes_count',
+                'comments as comments_count',
+                'retweets as retweets_count',
+            ])
+            ->with('user')
+            ->with('commentable') 
+            ->findOrFail($commentId);
+
+        $parent = $currentComment->commentable;
+
+        if ($parent instanceof \App\Models\Tweet) {
+            $tweet = $parent;
+        } elseif ($parent instanceof \App\Models\Comment) {
+            $tweet = $parent->commentable; 
+        } else {
+            abort(404, 'Parent of comment not found.');
+        }
 
         return inertia()->render('comment', [
-            'tweet' => Tweet::with('user')
+            'tweet' => $tweet->select(
+                'tweets.id',
+                'tweets.content',
+                'tweets.image',
+                'tweets.user_id',
+                'tweets.created_at'
+            )
+                ->withExists([
+                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
+                ])
                 ->withCount([
-                    'comments' => function ($query) {
-                        $query->where('commentable_type', Tweet::class);
-                    },
-                    'likes' => function ($query) {
-                        $query->where('likeable_type', Tweet::class);
-                    },
-                    'retweets' => function ($query) {
-                        $query->where('retweetable_type', Tweet::class);
-                    },
-                    'bookmarks' => function ($query) {
-                        $query->where('bookmarkable_type', Tweet::class);
-                    }
+                    'likes as likes_count',
+                    'comments as comments_count',
+                    'retweets as retweets_count',
                 ])
+                ->with('user')
+                ->findOrFail($tweet->id),
+            'current_comment' => $currentComment,
+            'comments' => Comment::select(
+                'comments.id',
+                'comments.content',
+                'comments.user_id',
+                'comments.commentable_id',
+                'comments.created_at'
+            )
+                ->where('comments.commentable_id', $commentId)
+                ->where('comments.commentable_type', 'App\Models\Comment')
                 ->withExists([
-                    'likes as is_liked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId);
-                    },
-                    'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId);
-                    },
-                    'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId);
-                    }
+                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
                 ])
-                ->findOrFail($postId),
-            'current_comment' => Comment::with('user')->withCount([
-                    'comments' => function ($query) {
-                        $query->where('commentable_type', Comment::class);
-                    },
-                    'likes' => function ($query) {
-                        $query->where('likeable_type', Comment::class);
-                    },
-                    'retweets' => function ($query) {
-                        $query->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks' => function ($query) {
-                        $query->where('bookmarkable_type', Comment::class);
-                    }
-                ])
-                ->withExists([
-                    'likes as is_liked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('likeable_type', Comment::class);
-                    },
-                    'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('bookmarkable_type', Comment::class);
-                    },
-                ])->findOrFail($commentId),
-            'comments' => Comment::with("user")
-                ->where('commentable_id', $commentId)
-                ->where('commentable_type', Comment::class)
                 ->withCount([
-                    'comments' => function ($query) {
-                        $query->where('commentable_type', Comment::class);
-                    },
-                    'likes' => function ($query) {
-                        $query->where('likeable_type', Comment::class);
-                    },
-                    'retweets' => function ($query) {
-                        $query->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks' => function ($query) {
-                        $query->where('bookmarkable_type', Comment::class);
-                    }
+                    'likes as likes_count',
+                    'comments as comments_count',
+                    'retweets as retweets_count',
                 ])
-                ->withExists([
-                    'likes as is_liked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('likeable_type', Comment::class);
-                    },
-                    'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('bookmarkable_type', Comment::class);
-                    },
-                ])
+                ->with('user')
                 ->get(),
         ]);
     }

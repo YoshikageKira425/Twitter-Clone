@@ -13,6 +13,7 @@ export default function Home() {
     const [comment, setComment] = useState('');
     const [allComments, setAllComments] = useState(comments);
 
+    console.log(tweet);
     console.log(current_comment);
     console.log(comments);
 
@@ -43,7 +44,7 @@ export default function Home() {
 
                 <Comment comment={current_comment} />
 
-                <div className="flex border-b border-gray-800 p-4">
+                <div className="flex border-b border-gray-800 p-4 bg-black">
                     <div className="flex w-full">
                         <textarea onChange={(e) => setComment(e.target.value)} value={comment}
                             className="h-12 w-full resize-none bg-transparent p-2 text-lg placeholder-gray-500 outline-none"

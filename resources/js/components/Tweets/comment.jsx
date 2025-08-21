@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegComment, FaRegHeart, FaRetweet } from 'react-icons/fa';
 
-export default function Comment({ comment }) {
+export default function Comment({ comment, is_inside_tweet = true }) {
     const [like, setLike] = useState(false);
     const [retweet, setRetweet] = useState(false);
     const [bookmark, setBookmark] = useState(false);
@@ -82,7 +82,7 @@ export default function Comment({ comment }) {
                 <p className="mt-1 text-white">{comment.content}</p>
 
                 <div className="mt-3 flex space-x-12 text-gray-500">
-                    <a href={`/tweet/${comment.commentable_id}/comment/${comment.id}`} className="flex cursor-pointer items-center space-x-2 hover:text-blue-500">
+                    <a href={`/comment/${comment.id}`} className="flex cursor-pointer items-center space-x-2 hover:text-blue-500">
                         <FaRegComment className="h-4 w-4" />
                         <span className="text-sm">{commentCount}</span>
                     </a>

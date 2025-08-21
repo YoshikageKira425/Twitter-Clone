@@ -13,6 +13,7 @@ export default function Home() {
     const [tweet, setTweet] = useState('');
     const tweetContainer = useRef(null);
     const [photo, setPhoto] = useState<string | null>(null);
+    console.log(allTweets);
 
     const handlePhotoUpload = (e) => {
         const file = e.target.files?.[0];

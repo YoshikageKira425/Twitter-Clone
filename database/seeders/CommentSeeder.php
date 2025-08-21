@@ -13,7 +13,11 @@ class CommentSeeder extends Seeder
      */
     public function run(): void
     {
-        Comment::factory(20)->forTweet()->create();
-        Comment::factory(20)->forComment()->create();
+        Comment::factory(20)->create([
+            'commentable_type' => 'App\Models\Tweet',
+        ]);;
+        Comment::factory(20)->create([
+            'commentable_type' => 'App\Models\Comment',
+        ]);;
     }
 }

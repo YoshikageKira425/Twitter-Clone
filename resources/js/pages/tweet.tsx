@@ -12,6 +12,8 @@ export default function Home() {
     const [comment, setComment] = useState('');
     const [allComments, setAllComments] = useState(comments);
 
+    console.log(tweet);
+
     const postComment = async () => {
         try {
             const response = await axios.post('/api/comments', { content: comment, commentable_id: tweet.id, commentable_type: "tweets" });

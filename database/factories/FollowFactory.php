@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Follow;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +17,19 @@ class FollowFactory extends Factory
      */
     public function definition(): array
     {
+        do {
+            $follower = fake()->numberBetween(1, 6);
+            $following = fake()->numberBetween(1, 6);
+        } while (
+            $follower === $following ||
+            Follow::where('follower_id', $follower)
+            ->where('following_id', $following)
+            ->exists()
+        );
+
         return [
-            "follower_id" => fake()->numberBetween(1, 5),
-            "followed_id" => fake()->numberBetween(1, 5),
+            'follower_id' => $follower,
+            'following_id' => $following,
         ];
     }
 }

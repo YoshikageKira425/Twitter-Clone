@@ -13,7 +13,11 @@ class RetweetSeeder extends Seeder
      */
     public function run(): void
     {
-        Retweet::factory(20)->forTweet()->create();
-        Retweet::factory(20)->forPost()->create();
+        Retweet::factory(20)->create([
+            'retweetable_type' => 'App\Models\Tweet',
+        ]);;
+        Retweet::factory(20)->create([
+            'retweetable_type' => 'App\Models\Comment',
+        ]);;
     }
 }

@@ -23,18 +23,4 @@ class CommentFactory extends Factory
             'commentable_type' => 'App\Models\Tweet',
         ];
     }
-
-    public function forTweet()
-    {
-        return $this->state(fn() => [
-            'commentable_type' => '\App\Models\Tweet::class',
-        ]);
-    }
-
-    public function forPost()
-    {
-        return $this->state(fn() => [
-            'commentable_type' => '\App\Models\Post::class',
-        ]);
-    }
 }

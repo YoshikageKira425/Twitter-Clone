@@ -16,33 +16,33 @@ class TweetController extends Controller
     {
         $userId = Auth::id();
 
-        return Inertia::render("home", ["tweets" => Tweet::with('user')
-            ->withCount([
-                'comments' => function ($query) {
-                    $query->where('commentable_type', Tweet::class);
-                },
-                'likes' => function ($query) {
-                    $query->where('likeable_type', Tweet::class);
-                },
-                'retweets' => function ($query) {
-                    $query->where('retweetable_type', Tweet::class);
-                },
-                'bookmarks' => function ($query) {
-                    $query->where('bookmarkable_type', Tweet::class);
-                },
-            ])
-            ->withExists([
-                'likes as is_liked_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                },
-                'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                },
-                'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                },
-            ])
-            ->get()]);
+        return Inertia::render("home", [
+            "tweets" => Tweet::select(
+                'id',
+                'content',
+                'image',
+                'user_id',
+                'created_at'
+            )
+                ->withCount([
+                    'likes as likes_count',
+                    'comments as comments_count',
+                    'retweets as retweets_count',
+                ])
+                ->withExists([
+                    'likes as is_liked_by_user' => fn($query) =>
+                    $query->where('user_id', $userId),
+
+                    'retweets as is_retweeted_by_user' => fn($query) =>
+                    $query->where('user_id', $userId),
+
+                    'bookmarks as is_bookmarked_by_user' => fn($query) =>
+                    $query->where('user_id', $userId),
+                ])
+                ->with('user')
+                ->latest() 
+                ->get()
+        ]);
     }
 
     public function show($id)
@@ -50,61 +50,40 @@ class TweetController extends Controller
         $userId = Auth::id();
 
         return Inertia::render("tweet", [
-            "tweet" => Tweet::with('user')
+            "tweet" => Tweet::select(
+                'id',
+                'content',
+                'image',
+                'user_id',
+                'created_at'
+            )
                 ->withCount([
-                    'comments' => function ($query) {
-                        $query->where('commentable_type', Tweet::class);
-                    },
-                    'likes' => function ($query) {
-                        $query->where('likeable_type', Tweet::class);
-                    },
-                    'retweets' => function ($query) {
-                        $query->where('retweetable_type', Tweet::class);
-                    },
-                    'bookmarks' => function ($query) {
-                        $query->where('bookmarkable_type', Tweet::class);
-                    }
+                    'likes as likes_count',
+                    'comments as comments_count',
+                    'retweets as retweets_count',
                 ])
                 ->withExists([
-                    'likes as is_liked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('likeable_type', Tweet::class);
-                    },
-                    'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('retweetable_type', Tweet::class);
-                    },
-                    'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('bookmarkable_type', Tweet::class);
-                    },
+                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
                 ])
+                ->with('user')
                 ->findOrFail($id),
-            "comments" => Tweet::find($id)
-                ->comments()
-                ->with("user")
+
+            "comments" => Comment::where('commentable_id', $id)
+                ->where('commentable_type', 'App\Models\Tweet')
                 ->withCount([
-                    'comments' => function ($query) {
-                        $query->where('commentable_type', Comment::class);
-                    },
-                    'likes' => function ($query) {
-                        $query->where('likeable_type', Comment::class);
-                    },
-                    'retweets' => function ($query) {
-                        $query->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks' => function ($query) {
-                        $query->where('bookmarkable_type', Comment::class);
-                    }
+                    'likes as likes_count',
+                    'comments as comments_count',
+                    'retweets as retweets_count',
                 ])
                 ->withExists([
-                    'likes as is_liked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('likeable_type', Comment::class);
-                    },
-                    'retweets as is_retweeted_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('retweetable_type', Comment::class);
-                    },
-                    'bookmarks as is_bookmarked_by_user' => function ($query) use ($userId) {
-                        $query->where('user_id', $userId)->where('bookmarkable_type', Comment::class);
-                    },
+                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
+                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
                 ])
+                ->with('user')
+                ->latest()
                 ->get(),
         ]);
     }
@@ -133,7 +112,7 @@ class TweetController extends Controller
 
             foreach ($hashtags as $hashtag) {
                 $hashtagModel = Hashtag::firstOrCreate(['name' => $hashtag]);
-                
+
                 HashtagPost::create([
                     'hashtag_id' => $hashtagModel->id,
                     'tweet_id' => $newTweet->id,
@@ -148,47 +127,4 @@ class TweetController extends Controller
             'success' => 'Tweet was made successfully.'
         ], 201);
     }
-
-    // public function edit($id)
-    // {
-    //     $tweet = Tweet::findOrFail($id);
-
-    //     if (Auth::id() !== $tweet->user_id) {
-    //         abort(403, 'Unauthorized action.');
-    //     }
-
-    //     return view('tweets.edit', compact('tweet'));
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $tweet = Tweet::findOrFail($id);
-
-    //     if (Auth::id() !== $tweet->user_id) {
-    //         abort(403, 'Unauthorized action.');
-    //     }
-
-    //     $request->validate([
-    //         'content' => 'required|string|max:280',
-    //     ]);
-
-    //     $tweet->update([
-    //         'content' => $request->content,
-    //     ]);
-
-    //     return redirect()->route('tweets.show', $tweet)->with('success', 'Tweet updated successfully.');
-    // }
-
-    // public function destroy($id)
-    // {
-    //     $tweet = Tweet::findOrFail($id);
-
-    //     if (Auth::id() !== $tweet->user_id) {
-    //         abort(403, 'Unauthorized action.');
-    //     }
-
-    //     $tweet->delete();
-
-    //     return redirect()->route('tweets.index')->with('success', 'Tweet deleted successfully.');
-    // }
 }

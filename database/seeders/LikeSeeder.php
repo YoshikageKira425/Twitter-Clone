@@ -13,7 +13,11 @@ class LikeSeeder extends Seeder
      */
     public function run(): void
     {
-        Like::factory(20)->forTweet()->create();
-        Like::factory(20)->forComment()->create();
+        Like::factory(20)->create([
+            'likeable_type' => 'App\Models\Tweet',
+        ]);;
+        Like::factory(20)->create([
+            'likeable_type' => 'App\Models\Comment',
+        ]);;
     }
 }

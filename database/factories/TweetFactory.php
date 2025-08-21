@@ -33,7 +33,7 @@ class TweetFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Tweet $tweet) {
-            preg_match('/#\w+/', $tweet->content, $matches);
+            preg_match('/#([\p{L}\p{N}_]+)/u', $tweet->content, $matches);
 
             if (!empty($matches)) {
                 $hashtagName = $matches[1];
