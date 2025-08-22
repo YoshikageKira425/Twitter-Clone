@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificationMail;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Tweet;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class RetweetController extends Controller
 {
@@ -31,13 +34,19 @@ class RetweetController extends Controller
             return back()->with('error', 'You have already retweeted this item.');
         }
 
-        Notification::create([
+        $notification = Notification::create([
             'to_user_id' => $model->user_id,
             'user_id' => $user->id,
             'type' => 'retweet',
             'data' => "You have a new retweeted on your {$type} by {$user->name}",
             'read' => false,
         ]);
+
+        $recipient = User::where("id", $model->user_id)->first();
+
+        if ($recipient) {
+            Mail::to($recipient->email)->queue(new NotificationMail($notification));
+        }
 
         $user->retweets()->create([
             'retweetable_id' => $id,

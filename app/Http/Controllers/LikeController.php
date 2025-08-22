@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificationMail;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Tweet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class LikeController extends Controller
 {
@@ -32,13 +35,19 @@ class LikeController extends Controller
             'user_id' => $user->id,
         ]);
 
-        Notification::create([
+        $notification = Notification::create([
             'to_user_id' => $model->user_id,
             'user_id' => $user->id,
             'type' => 'like',
             'data' => "You have a new like on your {$type} by {$user->name}",
             'read' => false,
         ]);
+
+        $recipient = User::where("id", $model->user_id)->first();
+
+        if ($recipient) {
+            Mail::to($recipient->email)->queue(new NotificationMail($notification));
+        }
 
         return back()->with('success', 'Item liked successfully.');
     }

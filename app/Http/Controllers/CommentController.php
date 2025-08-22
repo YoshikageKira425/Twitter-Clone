@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificationMail;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Tweet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 use function Pest\Laravel\get;
 
@@ -88,7 +91,7 @@ class CommentController extends Controller
 
     public function show($commentId)
     {
-        $userId = Auth::id(); 
+        $userId = Auth::id();
 
         $currentComment = Comment::withExists([
             'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
@@ -101,7 +104,7 @@ class CommentController extends Controller
                 'retweets as retweets_count',
             ])
             ->with('user')
-            ->with('commentable') 
+            ->with('commentable')
             ->findOrFail($commentId);
 
         $parent = $currentComment->commentable;
@@ -109,7 +112,7 @@ class CommentController extends Controller
         if ($parent instanceof \App\Models\Tweet) {
             $tweet = $parent;
         } elseif ($parent instanceof \App\Models\Comment) {
-            $tweet = $parent->commentable; 
+            $tweet = $parent->commentable;
         } else {
             abort(404, 'Parent of comment not found.');
         }
@@ -174,13 +177,19 @@ class CommentController extends Controller
             return back()->with('error', 'Invalid item to comment on.');
         }
 
-        Notification::create([
+        $notification = Notification::create([
             'to_user_id' => $model->user_id,
             'user_id' => $user->id,
             'type' => 'comment',
             'data' => "You have a new comment on your tweet by {$user->name}",
             'read' => false,
         ]);
+
+        $recipient = User::where("id", $model->user_id)->first();
+
+        if ($recipient) {
+            Mail::to($recipient->email)->queue(new NotificationMail($notification));
+        }
 
         $comment = $model->comments()->create([
             'user_id' => $user->id,

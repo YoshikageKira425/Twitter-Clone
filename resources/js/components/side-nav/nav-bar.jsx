@@ -5,6 +5,7 @@ import { BiHomeCircle } from 'react-icons/bi';
 import { BsTwitterX } from 'react-icons/bs';
 import { FiBell, FiHash, FiLogOut } from 'react-icons/fi';
 import { MdAdminPanelSettings } from 'react-icons/md';
+import { router } from '@inertiajs/react';
 
 export default function NavBar() {
     const { auth } = usePage().props;
@@ -21,9 +22,9 @@ export default function NavBar() {
             });
     });
 
-    const logOut = async () => {
+    const logOut = () => {
         if (confirm('Are you sure you want to log out?')) {
-            await axios.post('/logout');
+            router.post('/logout');
         }
     };
 
