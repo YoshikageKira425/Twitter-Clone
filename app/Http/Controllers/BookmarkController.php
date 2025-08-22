@@ -36,6 +36,7 @@ class BookmarkController extends Controller
             'user_id' => $user->id,
             'type' => 'bookmark',
             'data' => "You have a new retweeted on your {$type} by {$user->name}",
+            'read' => false,
         ]);
 
         $user->bookmarks()->create([

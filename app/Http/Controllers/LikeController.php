@@ -37,6 +37,7 @@ class LikeController extends Controller
             'user_id' => $user->id,
             'type' => 'like',
             'data' => "You have a new like on your {$type} by {$user->name}",
+            'read' => false,
         ]);
 
         return back()->with('success', 'Item liked successfully.');

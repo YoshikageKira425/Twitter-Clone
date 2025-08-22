@@ -36,6 +36,7 @@ class RetweetController extends Controller
             'user_id' => $user->id,
             'type' => 'retweet',
             'data' => "You have a new retweeted on your {$type} by {$user->name}",
+            'read' => false,
         ]);
 
         $user->retweets()->create([

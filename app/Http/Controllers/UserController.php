@@ -16,27 +16,35 @@ class UserController extends Controller
     {
         $userId = Auth::id();
 
+        $user = User::where('name', $username)
+            ->with(['followers', 'following'])
+            ->withExists([
+                'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
+            ])
+            ->with([
+                'tweets' => fn($query) => $query->with('user')
+                    ->withCount([
+                        'likes as likes_count',
+                        'comments as comments_count',
+                        'retweets as retweets_count',
+                    ])
+                    ->withExists([
+                        'likes as is_liked_by_user' => fn($q) => $q->where('user_id', $userId),
+                        'retweets as is_retweeted_by_user' => fn($q) => $q->where('user_id', $userId),
+                        'bookmarks as is_bookmarked_by_user' => fn($q) => $q->where('user_id', $userId),
+                    ])
+                    ->latest()
+            ])
+            ->firstOrFail();
+
+        $tweetsWithTypes = $user->tweets->map(function ($tweet) {
+            $tweet->type = 'tweet';
+            return $tweet;
+        });
+
         return Inertia::render("account", [
-            "user" => User::with(['followers', 'following'])
-                ->withExists([
-                    'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
-                ])
-                ->where('name', $username)
-                ->firstOrFail(),
-            "tweets" => Tweet::whereHas('user', fn($query) => $query->where('name', $username))
-                ->with('user') 
-                ->withCount([
-                    'likes as likes_count',
-                    'comments as comments_count',
-                    'retweets as retweets_count',
-                ])
-                ->withExists([
-                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
-                ])
-                ->latest()
-                ->get(),
+            "user" => $user,
+            "tweets" => $tweetsWithTypes,
         ]);
     }
 
@@ -44,27 +52,35 @@ class UserController extends Controller
     {
         $userId = Auth::id();
 
+        $user = User::where('name', $username)
+            ->with(['followers', 'following'])
+            ->withExists([
+                'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
+            ])
+            ->with([
+                'comments' => fn($query) => $query->with('user')
+                    ->withCount([
+                        'comments as comments_count',
+                        'likes as likes_count',
+                        'retweets as retweets_count',
+                    ])
+                    ->withExists([
+                        'likes as is_liked_by_user' => fn($q) => $q->where('user_id', $userId),
+                        'retweets as is_retweeted_by_user' => fn($q) => $q->where('user_id', $userId),
+                        'bookmarks as is_bookmarked_by_user' => fn($q) => $q->where('user_id', $userId),
+                    ])
+                    ->latest()
+            ])
+            ->firstOrFail();
+
+        $commentsWithTypes  = $user->comments->map(function ($comment) {
+            $comment->type = 'comment';
+            return $comment;
+        });
+
         return Inertia::render("account", [
-            "user" => User::with(['followers', 'following'])
-                ->withExists([
-                    'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
-                ])
-                ->where('name', $username)
-                ->firstOrFail(),
-            "tweets" => Comment::whereHas('user', fn($query) => $query->where('name', $username))
-                ->with('user')
-                ->withCount([
-                    'comments as comments_count',
-                    'likes as likes_count',
-                    'retweets as retweets_count',
-                ])
-                ->withExists([
-                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
-                ])
-                ->latest()
-                ->get(),
+            "user" => $user,
+            "tweets" => $commentsWithTypes,
         ]);
     }
 
@@ -72,31 +88,146 @@ class UserController extends Controller
     {
         $userId = Auth::id();
 
+        $user = User::where('name', $username)
+            ->with(['followers', 'following'])
+            ->withExists([
+                'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
+            ])
+            ->with([
+                'retweets' => fn($query) => $query->where('retweetable_type', Tweet::class)
+                    ->with([
+                        'retweetable.user',
+                        'retweetable.comments' => fn($q) => $q->with('user')->withCount([
+                            'likes as likes_count',
+                            'retweets as retweets_count',
+                            'comments as comments_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                            ]),
+                        'retweetable' => fn($q) => $q->withCount([
+                            'likes as likes_count',
+                            'comments as comments_count',
+                            'retweets as retweets_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                                'bookmarks as is_bookmarked_by_user' => fn($bms) => $bms->where('user_id', $userId),
+                            ])
+                    ])
+                    ->latest()
+            ])
+            ->firstOrFail();
+
+        $tweets = $user->retweets->map(function ($retweet) {
+            $post = $retweet->retweetable;
+            $post->type = $retweet->retweetable_type === Tweet::class ? 'tweet' : 'comment';
+            return $post;
+        });
+
         return Inertia::render("account", [
-            "user" => User::with(['followers', 'following'])
-                ->withExists([
-                    'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
-                ])
-                ->where('name', $username)
-                ->firstOrFail(),
-            "tweets" => Tweet::with('user')
-                ->withCount([
-                    'comments as comments_count',
-                    'likes as likes_count',
-                    'retweets as retweets_count',
-                ])
-                ->withExists([
-                    'likes as is_liked_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'retweets as is_retweeted_by_user' => fn($query) => $query->where('user_id', $userId),
-                    'bookmarks as is_bookmarked_by_user' => fn($query) => $query->where('user_id', $userId),
-                ])
-                ->whereHas('retweets', function ($query) use ($username) {
-                    $query->whereHas('user', function ($q) use ($username) {
-                        $q->where('name', $username);
-                    });
-                })
-                ->latest()
-                ->get(),
+            "user" => $user,
+            "tweets" => $tweets,
+        ]);
+    }
+
+    public function likes($username)
+    {
+        $userId = Auth::id();
+
+        $user = User::where('name', $username)
+            ->with(['followers', 'following'])
+            ->withExists([
+                'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
+            ])
+            ->with([
+                'likes' => fn($query) => $query->where('likeable_type', Tweet::class)
+                    ->with([
+                        'likeable.user',
+                        'likeable.comments' => fn($q) => $q->with('user')->withCount([
+                            'likes as likes_count',
+                            'retweets as retweets_count',
+                            'comments as comments_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                            ]),
+                        'likeable' => fn($q) => $q->withCount([
+                            'likes as likes_count',
+                            'comments as comments_count',
+                            'retweets as retweets_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                                'bookmarks as is_bookmarked_by_user' => fn($bms) => $bms->where('user_id', $userId),
+                            ])
+                    ])
+                    ->latest()
+            ])
+            ->firstOrFail();
+
+        $tweets = $user->likes->map(function ($like) {
+            $post = $like->likeable;
+            $post->type = $like->likeable_type === Tweet::class ? 'tweet' : 'comment';
+            return $post;
+        });
+
+        return Inertia::render("account", [
+            "user" => $user,
+            "tweets" => $tweets,
+        ]);
+    }
+
+    public function bookmark($username)
+    {
+        $userId = Auth::id();
+
+        $user = User::where('name', $username)
+            ->with(['followers', 'following'])
+            ->withExists([
+                'followers as is_followed' => fn($query) => $query->where('follower_id', $userId)
+            ])
+            ->with([
+                'bookmarks' => fn($query) => $query->where('bookmarkable_type', Tweet::class)
+                    ->with([
+                        'bookmarkable.user',
+                        'bookmarkable.comments' => fn($q) => $q->with('user')->withCount([
+                            'likes as likes_count',
+                            'retweets as retweets_count',
+                            'comments as comments_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                            ]),
+                        'bookmarkable' => fn($q) => $q->withCount([
+                            'likes as likes_count',
+                            'comments as comments_count',
+                            'retweets as retweets_count',
+                        ])
+                            ->withExists([
+                                'likes as is_liked_by_user' => fn($likes) => $likes->where('user_id', $userId),
+                                'retweets as is_retweeted_by_user' => fn($rts) => $rts->where('user_id', $userId),
+                                'bookmarks as is_bookmarked_by_user' => fn($bms) => $bms->where('user_id', $userId),
+                            ])
+                    ])
+                    ->latest()
+            ])
+            ->firstOrFail();
+
+        $tweets = $user->bookmarks->map(function ($bookmark) {
+            $post = $bookmark->bookmarkable;
+            $post->type = $bookmark->bookmarkable_type === Tweet::class ? 'tweet' : 'comment';
+            return $post;
+        });
+
+        return Inertia::render("account", [
+            "user" => $user,
+            "tweets" => $tweets,
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Follow;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,14 @@ class FollowController extends Controller
             return back()->with('error', 'You are already following this user.');
         }
 
+        Notification::create([
+            'to_user_id' => $user,
+            'user_id' => $follower,
+            'type' => 'follow',
+            'data' => "You have a new follower, {Auth::user()->name}",
+            'read' => false,
+        ]);
+
         Follow::create([
             'follower_id' => $follower,
             'following_id' => $user,
@@ -36,6 +45,14 @@ class FollowController extends Controller
         if (!$this->isFollowing($user)) {
             return back()->with('error', 'You are not following this user.');
         }
+
+        Notification::create([
+            'to_user_id' => $user,
+            'user_id' => $follower,
+            'type' => 'follow',
+            'data' => "{Auth::user()->name} has unfollowed you.",
+            'read' => false,
+        ]);
 
         Follow::where('follower_id', $follower)
             ->where('following_id', $user)

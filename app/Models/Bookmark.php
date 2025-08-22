@@ -20,7 +20,7 @@ class Bookmark extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function bookmarkble()
+    public function bookmarkable()
     {
         return $this->morphTo();
     }

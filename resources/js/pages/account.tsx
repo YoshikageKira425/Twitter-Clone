@@ -1,5 +1,6 @@
 import LeftBar from '@/components/side-nav/left-bar';
 import NavBar from '@/components/side-nav/nav-bar.jsx';
+import Comment from '@/components/tweets/comment';
 import Tweet from '@/components/tweets/tweet';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -12,7 +13,7 @@ export default function Account() {
     const [following, setFollowing] = useState(user.is_followed || false);
     const [showFollow, setShowFollow] = useState(false);
     const [content, setContent] = useState([]);
-    console.log(user);
+    console.log(tweets);
 
     const followClick = (content) => {
         setShowFollow(true);
@@ -100,15 +101,33 @@ export default function Account() {
                     </a>
                     <a
                         href={`/account/${user.name}/retweet`}
-                        className="m-0 h-full w-full p-3 text-center transition-colors duration-200 hover:bg-neutral-900"
+                        className="m-0 h-full w-full border-r border-gray-800 p-3 text-center transition-colors duration-200 hover:bg-neutral-900"
                     >
                         Retweet
                     </a>
+                    {auth.user.id === user.id ? (
+                        <>
+                            <a
+                                href={`/account/${user.name}/like`}
+                                className="m-0 h-full w-full border-r border-gray-800 p-3 text-center transition-colors duration-200 hover:bg-neutral-900"
+                            >
+                                Like
+                            </a>
+                            <a
+                                href={`/account/${user.name}/bookmark`}
+                                className="m-0 h-full w-full p-3 text-center transition-colors duration-200 hover:bg-neutral-900"
+                            >
+                                Bookmarks
+                            </a>
+                        </>
+                    ) : null}
                 </div>
 
                 <div>
                     {tweets.length > 0 ? (
-                        tweets.map((tweet, index) => <Tweet key={index} tweet={tweet} />)
+                        tweets.map((tweet, index) =>
+                            tweet.type === 'tweet' ? <Tweet key={index} tweet={tweet} /> : <Comment key={index} comment={tweet} />,
+                        )
                     ) : (
                         <div className="p-4 text-gray-500">No tweets available.</div>
                     )}
@@ -122,11 +141,7 @@ export default function Account() {
                         <ul className="space-y-4">
                             {content.map((follower) => (
                                 <li key={follower.id} className="flex items-center space-x-4">
-                                    <img
-                                        className="h-10 w-10 rounded-full"
-                                        src={follower.profile_image}
-                                        alt={`${follower.name}'s avatar`}
-                                    />
+                                    <img className="h-10 w-10 rounded-full" src={follower.profile_image} alt={`${follower.name}'s avatar`} />
                                     <div>
                                         <p className="font-semibold">{follower.name}</p>
                                     </div>

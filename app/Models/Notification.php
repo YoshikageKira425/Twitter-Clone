@@ -12,7 +12,8 @@ class Notification extends Model
         'to_user_id',
         'user_id',
         'type',
-        'data'
+        'data',
+        'read'
     ];
 
     public function user()

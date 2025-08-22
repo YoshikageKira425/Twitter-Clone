@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Notification;
 use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -172,6 +173,14 @@ class CommentController extends Controller
         if (!$model) {
             return back()->with('error', 'Invalid item to comment on.');
         }
+
+        Notification::create([
+            'to_user_id' => $model->user_id,
+            'user_id' => $user->id,
+            'type' => 'comment',
+            'data' => "You have a new comment on your tweet by {$user->name}",
+            'read' => false,
+        ]);
 
         $comment = $model->comments()->create([
             'user_id' => $user->id,

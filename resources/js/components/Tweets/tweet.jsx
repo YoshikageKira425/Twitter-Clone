@@ -110,7 +110,7 @@ export default function Tweet({ tweet }) {
                         </button>
                         <button
                             onClick={bookmarkClick}
-                            className={`flex cursor-pointer items-center space-x-2 ${!bookmark ? 'hover:text-neutral-600' : 'text-neutral-600 hover:text-neutral-800'}`}
+                            className={`flex cursor-pointer items-center space-x-2 text-white hover:text-neutral-600`}
                         >
                             {!bookmark ? <FaRegBookmark className="h-4 w-4" /> : <FaBookmark className="h-4 w-4" />}
                         </button>
