@@ -14,6 +14,7 @@ use App\Http\Controllers\TweetController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\RestrictUserAccess;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
@@ -67,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/selected-user', [SessionController::class, 'clearSelectedSearch']);
         });
     });
+});
+
+Route::get('/test-email', function () {
+    Mail::to('eneshalili425@gmail.com')->send(new \App\Mail\TestMail());
 });
 
 require __DIR__ . '/settings.php';
